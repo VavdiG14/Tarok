@@ -1,0 +1,10 @@
+Napovedi (glej list )
+    Primer:
+                     klukica           x         Napovedan
+            Kralji  1.okvirèek   2. okvirèek   3.okvirèek
+
+
+Krogci v dveh vrsticah
+
+Okno se odpre samo enkrat
+
