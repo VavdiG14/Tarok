@@ -1,7 +1,7 @@
 Napovedi (glej list )
     Primer:
                      klukica           x         Napovedan
-            Kralji  1.okvirèek   2. okvirèek   3.okvirèek
+            Kralji  1.okvirÄek   2. okvirÄek   3.okvirÄek
 
 
 Krogci v dveh vrsticah
