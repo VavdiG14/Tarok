@@ -17,12 +17,12 @@ class GUI():
         menu = tk.Menu(master)
         master.config(menu=menu)
         self.master.resizable(width=False, height=False)
-        self.številkaIgre = 1
+        self.številkaIgre = 2
         self.igralec1 = 0
         self.igralec2 = 0
         self.igralec3 = 0
         self.igralec4 = 0
-        self.radelc1 = 0
+        self.radelc1 = 9
         self.radelc2 = 0
         self.radelc3 = 0
         self.radelc4 = 0
@@ -38,7 +38,14 @@ class GUI():
         self.canvas5.grid(row=1, column=5)
         self.canvas7 = tk.Canvas(root, width=100, height=21, background='white')
         self.canvas7.grid(row=1, column=7)
-
+        self.canvas1 = tk.Canvas(root, width=100, height=21, background='white')
+        self.canvas1.grid(row=2, column=1)
+        # self.canvas3_2 = tk.Canvas(root, width=100, height=21, background='white')
+        # self.canvas3_2.grid(row=2, column=3)
+        # self.canvas5_2 = tk.Canvas(root, width=100, height=21, background='white')
+        # self.canvas5_2.grid(row=2, column=5)
+        # self.canvas7_2 = tk.Canvas(root, width=100, height=21, background='white')
+        # self.canvas7_2.grid(row=2, column=7)
 
 
         # Podmeni Igra
@@ -155,6 +162,20 @@ class GUI():
                 self.canvas7 = tk.Canvas(root, width=100, height=21, background='white')
                 self.canvas7.grid(row=1, column=7)
 
+        # def beli_okvirček2(stolpec):
+        #     if stolpec == 1:
+        #         self.canvas1_2 = tk.Canvas(root, width=100, height=21, background='white')
+        #         self.canvas1_2.grid(row=2, column=1)
+        #     elif stolpec == 3:
+        #         self.canvas3_2 = tk.Canvas(root, width=100, height=21, background='white')
+        #         self.canvas3_2.grid(row=2, column=3)
+        #     elif stolpec == 5:
+        #         self.canvas5_2 = tk.Canvas(root, width=100, height=21, background='white')
+        #         self.canvas5_2.grid(row=2, column=5)
+        #     elif stolpec == 7:
+        #         self.canvas7_2 = tk.Canvas(root, width=100, height=21, background='white')
+        #         self.canvas7_2.grid(row=2, column=7)
+
         def vrstaIgre():
             """Izriše vrsto igre"""
             igre = [('Tri', 10), ('Dva', 20), ('Ena', 30), ('Solo Tri', 40), ('Solo Dva', 50),
@@ -172,14 +193,14 @@ class GUI():
             tk.Checkbutton(izbira, text=self.imena[2], variable=self.kdo3).grid(row=2, column=5)
             tk.Checkbutton(izbira, text=self.imena[3], variable=self.kdo4).grid(row=2, column=6)
 
-        def narišiKrogec(št_radelcev,stolpec):
+        def narišiKrogec(št_radelcev,stolpec,vrstica):
             '''Narišemo krogec v stolpec'''
             '''št_radelcev: pove koliko radelcev moramo narisati'''
             '''stolpec: kateri stoplec rišemo'''
             if stolpec == 1:
                 if št_radelcev >= 1:
                     for koliko1 in range(1, št_radelcev+1):
-                        self.canvas1.create_oval(10 * (koliko1+1), 16, 10*koliko1, 6, fill='green' )
+                        self.canvas1.create_oval(10 * (koliko1+1), 16 +(vrstica*21), 10*koliko1, 6+(vrstica*21), fill='green' )
                 else:
                      self.canvas1 = tk.Canvas(root, width=100, height=21, background='white')
                      self.canvas1.grid(row=1, column=1)
@@ -208,12 +229,14 @@ class GUI():
         def risanjeKrogcev(sez):
             stolpec = 1
             for i in sez:
+                if i > 9:
+                    narišiKrogec(i,stolpec,2)
                 beli_okvirček(stolpec)
-                narišiKrogec(i, stolpec)
+                narišiKrogec(i, stolpec,0)
                 stolpec += 2
 
         def številoIger(number):
-            tk.Label(root, text=str(number-1)+'.', font=('Helvetica, 12')).grid(row=number, column=0)
+            tk.Label(root, text=str(number-2)+'.', font=('Helvetica, 12')).grid(row=number, column=0)
 
 
 
@@ -355,6 +378,7 @@ class GUI():
                     vsota = igraKlop(i)
                     izpišiKlop([i], vsota)
                 številoIger(self.številkaIgre)
+                pišiVzvezek([0, 1, 2, 3])
             else:
                 kdo = kdoIgra1([self.kdo1.get(), self.kdo2.get(), self.kdo3.get(), self.kdo4.get()]) #seznam [0,1,2,3] odvisno kdo igra
                 t = opozorilo1(kdo)             # če kličemo preveč igralcev
@@ -367,6 +391,7 @@ class GUI():
                     else:
                         vsota = igraSam(kdo)
                         izpiši(kdo, vsota)
+                pišiVzvezek(kdo)
             print(self.radelci)
 
         tk.Label(izbira, text="Zapisnik igre", font=("Helvetica", 20)).grid(row=0, column=0, columnspan=4) #naslov
@@ -409,7 +434,7 @@ class GUI():
         #------------------------------------------------------------------------
         tk.Label(izbira, text='Razlika: ').grid(row=10, column=3, sticky='W')
         tk.Entry(izbira, font="Helvetica 12", width=10, textvariable=razlika).grid(row=10, column=4)
-        tk.Button(izbira, text='Izpiši', command=lambda: iz()).grid(row=20, column=5)
+        gumb = tk.Button(izbira, text='Izpiši', command=lambda: iz()).grid(row=20, column=5)
 
 
 
