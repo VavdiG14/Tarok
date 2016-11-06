@@ -2,7 +2,7 @@ __author__ = 'Gregor'
 import tkinter as tk
 from tkinter import messagebox
 
-
+#dodal eno vrstico
 igre = {'Tri': 10, 'Dva': 20, 'Ena': 30, 'SoloTri': 40, 'SoloDva': 50, 'SoloEna': 60, 'Berač': 70, 'SoloBrez': 80, 'BarvniValat': 125,
         'Valat': 250}
 
