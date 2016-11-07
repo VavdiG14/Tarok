@@ -102,10 +102,14 @@ class GUI():
         self.kdo = tk.IntVar()
         self.kaj = tk.IntVar()
         self.igralec = tk.IntVar()
-        Nenapovedana1 = tk.IntVar()
-        Nenapovedana2 = tk.IntVar()
-        Nenapovedana3 = tk.IntVar()
-        Nenapovedana4 = tk.IntVar()
+        kralji = tk.IntVar()
+        Nenapovedana1 = tk.BooleanVar()
+        trula = tk.IntVar()
+        Nenapovedana2 = tk.BooleanVar()
+        kraljUltimo = tk.IntVar()
+        Nenapovedana3 = tk.BooleanVar()
+        pagatUltimo = tk.IntVar()
+        Nenapovedana4 = tk.BooleanVar()
         razlika = tk.IntVar()
         zmagal = tk.BooleanVar()
         self.skupaj1 = tk.IntVar()
@@ -165,6 +169,27 @@ class GUI():
                                anchor="w").grid(row=6 + vrstica, column=1)
             tk.Radiobutton(izbira, text='Klop', variable=self.kaj, value=1, width=10, anchor="w").grid(row=5, column=1)
 
+        def napovedi():
+            tk.Label(izbira, text = "Dodatne igre: ").grid(row=4, column=3, sticky='W')
+            tk.Label(izbira, text = "Naredil: ").grid(row=4, column=4, sticky='W')
+            tk.Label(izbira, text = "Izgubil: ").grid(row=4, column=5, sticky='W')
+            tk.Label(izbira, text = "Napovedan: ").grid(row=4, column=6, sticky='W')
+            tk.Label(izbira, text = 'Kralji').grid(row=5, column=3, sticky='W')
+            tk.Label(izbira, text = 'Trula').grid(row=6, column=3, sticky='W')
+            tk.Label(izbira, text = 'Kralj Ultimo').grid(row=7, column=3, sticky='W')
+            tk.Label(izbira, text = 'Pagat Ultimo').grid(row=8, column=3, sticky='W')
+            tk.Checkbutton(izbira, onvalue=10, variable=kralji).grid(row=5, column=4)
+            tk.Checkbutton(izbira, onvalue=-10, variable=kralji).grid(row=5, column=5)
+            tk.Checkbutton(izbira, onvalue=True, offvalue = False, variable=Nenapovedana1).grid(row=5, column=6)
+            tk.Checkbutton(izbira, onvalue=10, variable=trula).grid(row=6, column=4)
+            tk.Checkbutton(izbira, onvalue=-10, variable=trula).grid(row=6, column=5)
+            tk.Checkbutton(izbira, onvalue=True, offvalue = False, variable=Nenapovedana2).grid(row=6, column=6)
+            tk.Checkbutton(izbira, onvalue=10, variable=kraljUltimo).grid(row=7, column=4)
+            tk.Checkbutton(izbira, onvalue=-10, variable=kraljUltimo).grid(row=7, column=5)
+            tk.Checkbutton(izbira, onvalue=True, offvalue = False, variable=Nenapovedana3).grid(row=7, column=6)
+            tk.Checkbutton(izbira, onvalue=10, variable=pagatUltimo).grid(row=8, column=4)
+            tk.Checkbutton(izbira, onvalue=-10, variable=pagatUltimo).grid(row=8, column=5)
+            tk.Checkbutton(izbira, onvalue=True, offvalue = False, variable=Nenapovedana4).grid(row=8, column=6)
 
         def kdoIgra():
             """Nariše v okno Izbira, imena vseh igralcev"""
@@ -238,12 +263,26 @@ class GUI():
 
         def izračunTočk():
             igra = self.kaj.get()
-            dodatne = Nenapovedana1.get()+ Nenapovedana2.get()+ Nenapovedana3.get()+ Nenapovedana4.get()        #mogoče pomožna funkcija
             razlika1 = razlika.get()
             if igra >= 70 and igra != 80:
                 razlika1 = 0
-                dodatne = 0
-            return  igra + razlika1 + dodatne
+            print(igra)
+            print(razlika1)
+            return igra + razlika1
+
+        def izračunNapovedi():
+            igra = self.kaj.get()
+            napovediSkupaj = 0
+            dodatne = [kralji.get(), trula.get(), kraljUltimo.get(), pagatUltimo.get()]
+            napoved = [Nenapovedana1.get(), Nenapovedana2.get(), Nenapovedana3.get(), Nenapovedana4.get()]
+            for i in range(4):
+                k = dodatne[i]
+                if napoved[i]:
+                    k *= 2
+                napovediSkupaj += k
+            if igra >= 70 and igra != 80:
+                napovediSkupaj = 0
+            return napovediSkupaj
 
 
 
@@ -277,6 +316,7 @@ class GUI():
             '''v kolikor igra igro samo en igralec'''
             self.številkaIgre += 1
             seštevek = izračunTočk()
+            dodatne = izračunNapovedi()
             krogecOdPrej = False
             if self.radelci[s[0]] >= 1:         #imaš krogec od prej?
                 krogecOdPrej = True
@@ -287,11 +327,13 @@ class GUI():
                 self.radelci = list(map(lambda x: x + 1, self.radelci))
             if zmagal.get() and krogecOdPrej:
                 self.radelci[s[0]] -= 1
-                seštevek = seštevek * 2
-            elif not zmagal.get() and krogecOdPrej:
-                seštevek = seštevek * -2
-            elif not zmagal.get() and not krogecOdPrej:
-                seštevek = seštevek * -1
+                seštevek = (dodatne + seštevek) * 2
+            elif not zmagal.get():
+                seštevek = seštevek * (-1)
+                if krogecOdPrej:
+                    seštevek = (seštevek + dodatne) * 2
+                else:
+                    seštevek = seštevek + dodatne
             return seštevek
 
         def izpiši(s, vsota):
@@ -383,26 +425,26 @@ class GUI():
         vrstaIgre()
 
         #----------------------------------DODATNE IGRE -----------------------
-        tk.Label(izbira, text = "Dodatne igre - nenapovedane: ").grid(row=4, column=3, sticky = 'W')
+        napovedi()
 
-        tk.Checkbutton(izbira, text='Kralji', variable=Nenapovedana1, onvalue=10, width=10,
-                       anchor="w").grid(row=5, column=3)
-        tk.Checkbutton(izbira, text='Trula', variable=Nenapovedana2, onvalue=10, width=10,
-                       anchor="w").grid(row=6, column=3)
-        tk.Checkbutton(izbira, text='Zadnji kralj', variable=Nenapovedana3, onvalue=10, width=10,
-                       anchor="w").grid(row=7, column=3)
-        tk.Checkbutton(izbira, text='pagatUltimo', variable=Nenapovedana4, onvalue=25, width=10,
-                       anchor="w").grid(row=8, column=3)
-
-        tk.Label(izbira, text="Dodatne igre - napovedane: ").grid(row=4, column=5, sticky = 'W')
-        tk.Checkbutton(izbira, text='Kralji', variable=Nenapovedana1, onvalue=20, width=10,
-                       anchor="w").grid(row=5, column=5)
-        tk.Checkbutton(izbira, text='Trula', variable=Nenapovedana2, onvalue=20, width=10,
-                       anchor="w").grid(row=6, column=5)
-        tk.Checkbutton(izbira, text='Zadnji kralj', variable=Nenapovedana3, onvalue=20, width=10,
-                       anchor="w").grid(row=7, column=5)
-        tk.Checkbutton(izbira, text='pagatUltimo', variable=Nenapovedana4, onvalue=50, width=10,
-                       anchor="w").grid(row=8, column=5)
+        # tk.Checkbutton(izbira, text='Kralji', variable=Nenapovedana1, onvalue=10, width=10,
+        #                anchor="w").grid(row=5, column=3)
+        # tk.Checkbutton(izbira, text='Trula', variable=Nenapovedana2, onvalue=10, width=10,
+        #                anchor="w").grid(row=6, column=3)
+        # tk.Checkbutton(izbira, text='Zadnji kralj', variable=Nenapovedana3, onvalue=10, width=10,
+        #                anchor="w").grid(row=7, column=3)
+        # tk.Checkbutton(izbira, text='pagatUltimo', variable=Nenapovedana4, onvalue=25, width=10,
+        #                anchor="w").grid(row=8, column=3)
+        #
+        # tk.Label(izbira, text="Dodatne igre - napovedane: ").grid(row=4, column=5, sticky = 'W')
+        # tk.Checkbutton(izbira, text='Kralji', variable=Nenapovedana1, onvalue=20, width=10,
+        #                anchor="w").grid(row=5, column=5)
+        # tk.Checkbutton(izbira, text='Trula', variable=Nenapovedana2, onvalue=20, width=10,
+        #                anchor="w").grid(row=6, column=5)
+        # tk.Checkbutton(izbira, text='Zadnji kralj', variable=Nenapovedana3, onvalue=20, width=10,
+        #                anchor="w").grid(row=7, column=5)
+        # tk.Checkbutton(izbira, text='pagatUltimo', variable=Nenapovedana4, onvalue=50, width=10,
+        #                anchor="w").grid(row=8, column=5)
         #--------ZMAGAL/ZGUBIL--------------------------
         tk.Label(izbira, text = 'Zmagal/Izgubil').grid(row=12, column=3)
         tk.Radiobutton(izbira, text='Zmagal', variable=zmagal, value=True, width=10,
