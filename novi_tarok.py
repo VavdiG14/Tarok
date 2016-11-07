@@ -266,8 +266,6 @@ class GUI():
             razlika1 = razlika.get()
             if igra >= 70 and igra != 80:
                 razlika1 = 0
-            print(igra)
-            print(razlika1)
             return igra + razlika1
 
         def izračunNapovedi():
