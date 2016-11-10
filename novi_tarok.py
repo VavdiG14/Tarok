@@ -38,7 +38,8 @@ class GUI():
         self.canvas5.grid(row=1, column=5)
         self.canvas7 = tk.Canvas(root, width=100, height=21, background='white')
         self.canvas7.grid(row=1, column=7)
-
+        self.gumbVnesi = tk.Button(root, text='Vnesi igro', command=self.igra)
+        self.gumbVnesi.grid(row=1, column=20)
 
 
         # Podmeni Igra
@@ -57,7 +58,6 @@ class GUI():
             tk.Label(root, text=ime_2.get(), font=('Helvetica', 14)).grid(row=0, column=3)
             tk.Label(root, text=ime_3.get(), font=('Helvetica', 14)).grid(row=0, column=5)
             tk.Label(root, text=ime_4.get(), font=('Helvetica', 14)).grid(row=0, column=7)
-            tk.Button(root, text='Vnesi igro', command=self.igra).grid(row=0, column=20)
             self.imena = [ime_1.get(), ime_2.get(), ime_3.get(),ime_4.get()]
             new_game.destroy()
 
@@ -95,10 +95,14 @@ class GUI():
 
 
     def igra(self):
-
+        self.gumbVnesi.config(state='disable')
         izbira = tk.Toplevel()
         izbira.title("Tarok - Izpis igre")                # Naslov okna
-        izbira.resizable(width=False, height=False)         # Velikosti okna ni mogoče spreminjati
+        izbira.resizable(width=False, height=False)
+        def zapri():
+                self.gumbVnesi.config(state='normal')
+                izbira.destroy()
+        izbira.protocol('WM_DELETE_WINDOW', zapri)  # root is your root window
         self.kdo = tk.IntVar()
         self.kaj = tk.IntVar()
         self.igralec = tk.IntVar()
@@ -425,24 +429,6 @@ class GUI():
         #----------------------------------DODATNE IGRE -----------------------
         napovedi()
 
-        # tk.Checkbutton(izbira, text='Kralji', variable=Nenapovedana1, onvalue=10, width=10,
-        #                anchor="w").grid(row=5, column=3)
-        # tk.Checkbutton(izbira, text='Trula', variable=Nenapovedana2, onvalue=10, width=10,
-        #                anchor="w").grid(row=6, column=3)
-        # tk.Checkbutton(izbira, text='Zadnji kralj', variable=Nenapovedana3, onvalue=10, width=10,
-        #                anchor="w").grid(row=7, column=3)
-        # tk.Checkbutton(izbira, text='pagatUltimo', variable=Nenapovedana4, onvalue=25, width=10,
-        #                anchor="w").grid(row=8, column=3)
-        #
-        # tk.Label(izbira, text="Dodatne igre - napovedane: ").grid(row=4, column=5, sticky = 'W')
-        # tk.Checkbutton(izbira, text='Kralji', variable=Nenapovedana1, onvalue=20, width=10,
-        #                anchor="w").grid(row=5, column=5)
-        # tk.Checkbutton(izbira, text='Trula', variable=Nenapovedana2, onvalue=20, width=10,
-        #                anchor="w").grid(row=6, column=5)
-        # tk.Checkbutton(izbira, text='Zadnji kralj', variable=Nenapovedana3, onvalue=20, width=10,
-        #                anchor="w").grid(row=7, column=5)
-        # tk.Checkbutton(izbira, text='pagatUltimo', variable=Nenapovedana4, onvalue=50, width=10,
-        #                anchor="w").grid(row=8, column=5)
         #--------ZMAGAL/ZGUBIL--------------------------
         tk.Label(izbira, text = 'Zmagal/Izgubil').grid(row=12, column=3)
         tk.Radiobutton(izbira, text='Zmagal', variable=zmagal, value=True, width=10,
@@ -452,7 +438,9 @@ class GUI():
         #------------------------------------------------------------------------
         tk.Label(izbira, text='Razlika: ').grid(row=10, column=3, sticky='W')
         tk.Entry(izbira, font="Helvetica 12", width=10, textvariable=razlika).grid(row=10, column=4)
-        gumb = tk.Button(izbira, text='Izpiši', command=lambda: iz()).grid(row=20, column=5)
+        gumbIzpiši = tk.Button(izbira, text='Izpiši', command=lambda: iz()).grid(row=20, column=5)
+
+
 
 
 
