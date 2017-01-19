@@ -101,8 +101,9 @@ class GUI():
         izbira.resizable(width=False, height=False)
         def zapri():
                 self.gumbVnesi.config(state='normal')
-                izbira.destroy()
+                root.destroy()
         izbira.protocol('WM_DELETE_WINDOW', zapri)  # root is your root window
+
         self.kdo = tk.IntVar()
         self.kaj = tk.IntVar()
         self.igralec = tk.IntVar()
@@ -114,6 +115,7 @@ class GUI():
         Nenapovedana3 = tk.BooleanVar()
         pagatUltimo = tk.IntVar()
         Nenapovedana4 = tk.BooleanVar()
+        mondFang = tk.IntVar()
         razlika = tk.IntVar()
         zmagal = tk.BooleanVar()
         self.skupaj1 = tk.IntVar()
@@ -182,6 +184,7 @@ class GUI():
             tk.Label(izbira, text = 'Trula').grid(row=6, column=3, sticky='W')
             tk.Label(izbira, text = 'Kralj Ultimo').grid(row=7, column=3, sticky='W')
             tk.Label(izbira, text = 'Pagat Ultimo').grid(row=8, column=3, sticky='W')
+            tk.Label(izbira, text = 'Mond fang').grid(row=9, column=3, sticky='W')
             tk.Checkbutton(izbira, onvalue=10, variable=kralji).grid(row=5, column=4)
             tk.Checkbutton(izbira, onvalue=-10, variable=kralji).grid(row=5, column=5)
             tk.Checkbutton(izbira, onvalue=True, offvalue = False, variable=Nenapovedana1).grid(row=5, column=6)
@@ -194,6 +197,7 @@ class GUI():
             tk.Checkbutton(izbira, onvalue=10, variable=pagatUltimo).grid(row=8, column=4)
             tk.Checkbutton(izbira, onvalue=-10, variable=pagatUltimo).grid(row=8, column=5)
             tk.Checkbutton(izbira, onvalue=True, offvalue = False, variable=Nenapovedana4).grid(row=8, column=6)
+            tk.Checkbutton(izbira, onvalue=-20, variable=mondFang).grid(row=9, column=5)
 
         def kdoIgra():
             """Nariše v okno Izbira, imena vseh igralcev"""
@@ -257,7 +261,6 @@ class GUI():
             kdo.resizable(width=False, height=False)         # Velikosti okna ni mogoče spreminjati
             tk.Label(kdo, text='Kdo je igral igro?').grid(row=1)
             seznam = self.imena
-            print(seznam)
             for (m, i) in enumerate(seznam):
                 tk.Radiobutton(kdo, text=i, variable=self.igralec, value=m).grid(row=m, column=m+1)
             tk.Button(kdo, text='Vredu', command=lambda: zapri(s)).grid(row=2)
@@ -286,27 +289,28 @@ class GUI():
                 napovediSkupaj = 0
             return napovediSkupaj
 
-
+        def imasRadelc(s):
+            krogecOdPrej = False
+            if self.radelci[s[0]] >= 1:         #imaš krogec od prej?
+                krogecOdPrej = True
+            else:
+                krogecOdPrej = False
+            return krogecOdPrej
 
 
         def igraKlop(indeks):
             '''Vnašanje igre pri igri KLOP'''
             '''s: seznam [0,1,2,3] ker igrajo vsi igralci'''
-            krogecOdPrej = False
-            if self.radelci[indeks] >= 1:         #imaš krogec od prej?
-                krogecOdPrej = True
-            else:
-                krogecOdPrej = False
-            seznamKlop = self.seznam
+            krogecOdPrej = imasRadelc([indeks])
             seštevek = self.seznam[indeks]
             if seštevek == 0:
                 seštevek = 70
-            elif seštevek >= 35:
+            elif abs(seštevek) > 35:
                 seštevek = -70
             else:
-                seštevek = seštevek * (-1)
+                seštevek = abs(seštevek) * (-1)
             if krogecOdPrej:
-                if seštevek == 70:
+                if abs(seštevek)== 70:
                     seštevek = 140
                     self.radelci[indeks] -= 1
                 else:
@@ -314,28 +318,25 @@ class GUI():
             self.radelci[indeks] += 1
             return seštevek
 
+
+
         def igraSam(s):
             '''v kolikor igra igro samo en igralec'''
             self.številkaIgre += 1
-            seštevek = izračunTočk()
-            dodatne = izračunNapovedi()
-            krogecOdPrej = False
-            if self.radelci[s[0]] >= 1:         #imaš krogec od prej?
-                krogecOdPrej = True
-            else:
-                krogecOdPrej = False
+            seštevek = izračunTočk() + izračunNapovedi()
+            krogecOdPrej = imasRadelc(s)
             kajIgramo = self.kaj.get()
             if kajIgramo >= 70:
                 self.radelci = list(map(lambda x: x + 1, self.radelci))
             if zmagal.get() and krogecOdPrej:
                 self.radelci[s[0]] -= 1
-                seštevek = (dodatne + seštevek) * 2
+                seštevek = seštevek * 2
             elif not zmagal.get():
                 seštevek = seštevek * (-1)
                 if krogecOdPrej:
-                    seštevek = (seštevek + dodatne) * 2
+                    seštevek = seštevek * 2
                 else:
-                    seštevek = seštevek + dodatne
+                    seštevek = seštevek
             return seštevek
 
         def izpiši(s, vsota):
@@ -375,6 +376,20 @@ class GUI():
                 j += 1
             return seznam
 
+        def mondfang(s):
+            def zapri(s):
+                mond.destroy()
+            mond = tk.Toplevel()
+            mond.grab_set()                                   # Postavi fokus na okno in ga obdrži
+            mond.title("Mond Fang")                # Naslov okna
+            mond.resizable(width=False, height=False)         # Velikosti okna ni mogoče spreminjati
+            tk.Label(mond, text='Kdo si je priigral mond fang?').grid(row=1)
+            seznam = self.imena
+            for (m, i) in enumerate(seznam):
+                tk.Radiobutton(mond, text=i, variable=self.igralec, value=m).grid(row=m, column=m+1)
+            tk.Button(mond, text='Vredu', command=lambda: zapri(s)).grid(row=2)
+            mond.wait_window(mond)
+
         def pišiVzvezek(s):
             '''Rezultat trenutne igre zapišemo v datoteko .txt'''
             file = open("tarok.txt", "w")
@@ -393,12 +408,38 @@ class GUI():
 
         def iz():
             '''Ob kliku na gumb Izpiši se izvede ta funkcija'''
-            if self.kaj.get() == 1: #če gre za igro klop
+            if mondFang.get() == -20:
+                self.številkaIgre += 1
+                mondfang([0,1,2,3])
+                g = self.igralec.get()
+                if imasRadelc([g]):
+                    vsota = -40
+                else:
+                    vsota = -20
+                izpiši([g], vsota)
+                številoIger(self.številkaIgre)
+            elif self.kaj.get() == 1: #če gre za igro klop
                 klop()
                 self.številkaIgre += 1
-                for i in range(4):
-                    vsota = igraKlop(i)
-                    izpišiKlop([i], vsota)
+                klopVseznam = [igraKlop(i) for i in range(4)]
+                print(klopVseznam)
+                if -140 in klopVseznam:
+                    izpiši([klopVseznam.index(-140)], -140)
+                    k = 0
+                    for i in klopVseznam:
+                        if i == 70 or i == 140:
+                            izpiši([k], i)
+                        k += 1
+                elif -70 in klopVseznam:
+                    izpiši([klopVseznam.index(-70)], -70)
+                    for b in klopVseznam:
+                        if b == 70 or b == 140:
+                            izpiši([klopVseznam.index(70)], b)
+                else:
+                    k = 0
+                    for j in klopVseznam:
+                        izpiši([k], j)
+                        k += 1
                 številoIger(self.številkaIgre)
                 pišiVzvezek([0, 1, 2, 3])
             else:
@@ -414,7 +455,7 @@ class GUI():
                         vsota = igraSam(kdo)
                         izpiši(kdo, vsota)
                 pišiVzvezek(kdo)
-            print(self.radelci)
+
 
         tk.Label(izbira, text="Zapisnik igre", font=("Helvetica", 20)).grid(row=0, column=0, columnspan=4) #naslov
         #-------------------KDO JE IGRAL ----------------------------
